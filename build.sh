@@ -17,6 +17,7 @@ if [[ "${SHOULD_BUILD}" == "yes" ]]; then
   yarn monaco-compile-check
   yarn valid-layers-check
 
+  yarn gulp compile-web
   yarn gulp compile-build
   yarn gulp compile-extension-media
   yarn gulp compile-extensions-build
