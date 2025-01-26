@@ -21,6 +21,7 @@ cd vscode || { echo "'vscode' dir not found"; exit 1; }
 # apply patches
 { set +x; } 2>/dev/null
 
+true || {
 for file in ../patches/*.patch; do
   if [[ -f "${file}" ]]; then
     echo applying patch: "${file}";
@@ -65,6 +66,7 @@ if [[ -d "../patches/${OS_NAME}/" ]]; then
     fi
   done
 fi
+}
 
 set -x
 
