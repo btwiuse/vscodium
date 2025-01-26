@@ -23,8 +23,8 @@ export VSCODE_NODEJS_URLROOT='/download/release'
 export VSCODE_NODEJS_URLSUFFIX=''
 
 if [[ "${VSCODE_ARCH}" == "x64" ]]; then
-  GLIBC_VERSION="2.17"
-  GLIBCXX_VERSION="3.4.22"
+  # GLIBC_VERSION="2.17"
+  # GLIBCXX_VERSION="3.4.22"
   VSCODE_REMOTE_DEPENDENCIES_CONTAINER_NAME="vscodium/vscodium-linux-build-agent:centos7-devtoolset8-${VSCODE_ARCH}"
 
   export VSCODE_NODEJS_SITE='https://unofficial-builds.nodejs.org'
