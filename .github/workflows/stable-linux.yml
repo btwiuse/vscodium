@@ -352,8 +352,6 @@ jobs:
         include:
         - vscode_arch: x64
           npm_arch: x64
-        - vscode_arch: arm64
-          npm_arch: arm64
     env:
       BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
       DISABLED: ${{ vars[format('DISABLE_STABLE_ALPINE_REH_{0}', matrix.slug)] }}
@@ -462,7 +460,6 @@ jobs:
       matrix:
         platform:
         - amd64
-        - arm64
     if: needs.check.outputs.SHOULD_DEPLOY == 'yes' && vars.DISABLE_STABLE_SNAP != 'yes'
 
     steps:
