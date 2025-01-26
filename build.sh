@@ -17,7 +17,6 @@ if [[ "${SHOULD_BUILD}" == "yes" ]]; then
   yarn monaco-compile-check
   yarn valid-layers-check
 
-  yarn gulp compile-web
   yarn gulp compile-build
   yarn gulp compile-extension-media
   yarn gulp compile-extensions-build
@@ -38,7 +37,6 @@ if [[ "${SHOULD_BUILD}" == "yes" ]]; then
 
       if [[ "${VSCODE_ARCH}" != "x64" ]]; then
         SHOULD_BUILD_REH="no"
-        SHOULD_BUILD_WEB="no"
         SHOULD_BUILD_REH_WEB="no"
       fi
     fi
@@ -58,11 +56,6 @@ if [[ "${SHOULD_BUILD}" == "yes" ]]; then
   if [[ "${SHOULD_BUILD_REH}" != "no" ]]; then
     yarn gulp minify-vscode-reh
     yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
-  fi
-
-  if [[ "${SHOULD_BUILD_WEB}" != "no" ]]; then
-    yarn gulp minify-vscode-web
-    yarn gulp "vscode-web-min-ci"
   fi
 
   if [[ "${SHOULD_BUILD_REH_WEB}" != "no" ]]; then

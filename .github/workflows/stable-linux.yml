@@ -141,8 +141,7 @@ jobs:
         with:
           name: vscode
           path: ./vscode.tar.gz
-          retention-days: ${{ needs.check.outputs.SHOULD_DEPLOY == 'yes' && 30 || 1 }}
-        if: env.SHOULD_BUILD == 'yes'
+          retention-days: 30
 
   build:
     needs:
@@ -241,8 +240,7 @@ jobs:
         with:
           name: bin-${{ matrix.vscode_arch }}
           path: assets/
-          retention-days: 3
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes' && env.SHOULD_DEPLOY == 'no' && github.event.inputs.generate_assets == 'true'
+          retention-days: 30
 
   reh_linux:
     needs:
@@ -338,8 +336,7 @@ jobs:
         with:
           name: reh-linux-${{ matrix.vscode_arch }}
           path: assets/
-          retention-days: 3
-        if: env.DISABLED != 'yes' && env.SHOULD_DEPLOY == 'no' && github.event.inputs.generate_assets == 'true'
+          retention-days: 30
 
   reh_alpine:
     needs:
@@ -419,8 +416,7 @@ jobs:
         with:
           name: reh-alpine-${{ matrix.vscode_arch }}
           path: assets/
-          retention-days: 3
-        if: env.DISABLED != 'yes' && env.SHOULD_DEPLOY == 'no' && github.event.inputs.generate_assets == 'true'
+          retention-days: 30
 
   aur:
     needs:
