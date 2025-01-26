@@ -161,8 +161,9 @@ export VSCODE_NODE_GLIBC="-glibc-${GLIBC_VERSION}"
 
 if [[ "${SHOULD_BUILD_REH}" != "no" ]]; then
   echo "Building REH"
-  yarn gulp minify-vscode-reh
-  yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
+  # yarn gulp minify-vscode-reh
+  # yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
+  yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
 
   EXPECTED_GLIBC_VERSION="${GLIBC_VERSION}" EXPECTED_GLIBCXX_VERSION="${GLIBCXX_VERSION}" SEARCH_PATH="../vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}" ./build/azure-pipelines/linux/verify-glibc-requirements.sh
 
@@ -180,8 +181,9 @@ fi
 
 if [[ "${SHOULD_BUILD_WEB}" != "no" ]]; then
   echo "Building WEB"
-  yarn gulp minify-vscode-web
-  yarn gulp "vscode-web-min-ci"
+  yarn gulp vscode-web
+  # yarn gulp minify-vscode-web
+  # yarn gulp "vscode-web-min-ci"
 
   pushd "../vscode-web"
 
@@ -193,8 +195,9 @@ fi
 
 if [[ "${SHOULD_BUILD_REH_WEB}" != "no" ]]; then
   echo "Building REH-web"
-  yarn gulp minify-vscode-reh-web
-  yarn gulp "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
+  # yarn gulp minify-vscode-reh-web
+  # yarn gulp "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
+  yarn gulp "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
 
   EXPECTED_GLIBC_VERSION="${GLIBC_VERSION}" EXPECTED_GLIBCXX_VERSION="${GLIBCXX_VERSION}" SEARCH_PATH="../vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}" ./build/azure-pipelines/linux/verify-glibc-requirements.sh
 
