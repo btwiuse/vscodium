@@ -160,7 +160,6 @@ jobs:
       image: ${{ matrix.image }}
     env:
       BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
-      DISABLED: ${{ vars[format('DISABLE_STABLE_LINUX_APP_{0}', matrix.slug)] }}
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
@@ -176,17 +175,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.GITHUB_BRANCH }}
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes'
 
       - name: Switch to relevant branch
         env:
           PULL_REQUEST_ID: ${{ github.event.inputs.checkout_pr }}
         run: ./get_pr.sh
-        if: env.DISABLED != 'yes'
 
       - name: Install GH
         run: ./install_gh.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes' && env.SHOULD_DEPLOY == 'yes'
 
       - name: Check existing VSCodium tags/releases
         env:
@@ -194,38 +190,32 @@ jobs:
           DISABLE_APPIMAGE: ${{ vars.DISABLE_STABLE_APPIMAGE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./check_tags.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes'
 
       - name: Install libkrb5-dev
         run: sudo apt-get update -y && sudo apt-get install -y libkrb5-dev
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes'
 
       - name: Download vscode artifact
         uses: actions/download-artifact@v4
         with:
           name: vscode
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes'
 
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           npm_config_arch: ${{ matrix.npm_arch }}
         run: ./package_linux_bin.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes'
 
       - name: Prepare assets
         env:
           SHOULD_BUILD_REH: 'no'
           SHOULD_BUILD_REH_WEB: 'no'
         run: ./prepare_assets.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes' && (env.SHOULD_DEPLOY == 'yes' || github.event.inputs.generate_assets == 'true')
 
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
           GITHUB_USERNAME: ${{ github.repository_owner }}
         run: ./release.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes' && env.SHOULD_DEPLOY == 'yes'
 
       - name: Update versions repo
         env:
@@ -233,7 +223,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
           GITHUB_USERNAME: ${{ github.repository_owner }}
         run: ./update_version.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes' && env.SHOULD_DEPLOY == 'yes'
 
       - name: Upload assets
         uses: actions/upload-artifact@v4
@@ -256,7 +245,6 @@ jobs:
           npm_arch: x64
     env:
       BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
-      DISABLED: ${{ vars[format('DISABLE_STABLE_LINUX_REH_{0}', matrix.slug)] }}
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
@@ -269,72 +257,145 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.GITHUB_BRANCH }}
-        if: env.DISABLED != 'yes'
 
       - name: Switch to relevant branch
         env:
           PULL_REQUEST_ID: ${{ github.event.inputs.checkout_pr }}
         run: ./get_pr.sh
-        if: env.DISABLED != 'yes'
 
       - name: Setup GCC
         uses: egor-tensin/setup-gcc@v1
         with:
           version: 10
           platform: x64
-        if: env.DISABLED != 'yes'
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
           node-version: '20.18'
-        if: env.DISABLED != 'yes'
 
       - name: Setup Python 3
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-        if: env.DISABLED != 'yes'
 
       - name: Install libkrb5-dev
         run: sudo apt-get update -y && sudo apt-get install -y libkrb5-dev
-        if: env.DISABLED != 'yes'
 
       - name: Install GH
         run: ./install_gh.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_DEPLOY == 'yes'
 
       - name: Check existing VSCodium tags/releases
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHECK_ONLY_REH: 'yes'
         run: ./check_tags.sh
-        if: env.DISABLED != 'yes'
 
       - name: Download vscode artifact
         uses: actions/download-artifact@v4
         with:
           name: vscode
-        if: env.DISABLED != 'yes' && (env.SHOULD_BUILD_REH != 'no' || env.SHOULD_BUILD_REH_WEB != 'no' || github.event.inputs.generate_assets == 'true')
 
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           npm_config_arch: ${{ matrix.npm_arch }}
         run: ./package_linux_reh.sh
-        if: env.DISABLED != 'yes' && (env.SHOULD_BUILD_REH != 'no' || env.SHOULD_BUILD_REH_WEB != 'no' || github.event.inputs.generate_assets == 'true')
 
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
           GITHUB_USERNAME: ${{ github.repository_owner }}
         run: ./release.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_DEPLOY == 'yes' && (env.SHOULD_BUILD_REH != 'no' || env.SHOULD_BUILD_REH_WEB != 'no')
 
       - name: Upload assets
         uses: actions/upload-artifact@v4
         with:
           name: reh-linux-${{ matrix.vscode_arch }}
+          path: assets/
+          retention-days: 30
+
+  web:
+    needs:
+      - check
+      - compile
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - slug: X64
+          vscode_arch: x64
+          npm_arch: x64
+    env:
+      BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
+      MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
+      MS_TAG: ${{ needs.check.outputs.MS_TAG }}
+      RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
+      SHOULD_BUILD: ${{ needs.check.outputs.SHOULD_BUILD }}
+      SHOULD_DEPLOY: ${{ needs.check.outputs.SHOULD_DEPLOY }}
+      VSCODE_ARCH: ${{ matrix.vscode_arch }}
+    if: needs.check.outputs.SHOULD_BUILD == 'yes' || github.event.inputs.generate_assets == 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.GITHUB_BRANCH }}
+
+      - name: Switch to relevant branch
+        env:
+          PULL_REQUEST_ID: ${{ github.event.inputs.checkout_pr }}
+        run: ./get_pr.sh
+
+      - name: Setup GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 10
+          platform: x64
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.18'
+
+      - name: Setup Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install libkrb5-dev
+        run: sudo apt-get update -y && sudo apt-get install -y libkrb5-dev
+
+      - name: Install GH
+        run: ./install_gh.sh
+
+      - name: Check existing VSCodium tags/releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECK_ONLY_REH: 'yes'
+        run: ./check_tags.sh
+
+      - name: Download vscode artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vscode
+
+      - name: Build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          npm_config_arch: ${{ matrix.npm_arch }}
+        run: ./package_web.sh
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
+          GITHUB_USERNAME: ${{ github.repository_owner }}
+        run: ./release.sh
+
+      - name: Upload assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-${{ matrix.vscode_arch }}
           path: assets/
           retention-days: 30
 
@@ -417,106 +478,3 @@ jobs:
           name: reh-alpine-${{ matrix.vscode_arch }}
           path: assets/
           retention-days: 30
-
-  aur:
-    needs:
-      - check
-      - build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-        - package_name: vscodium
-          package_type: stable
-        # - package_name: vscodium-git
-        #   package_type: rolling
-    if: needs.check.outputs.SHOULD_DEPLOY == 'yes'
-
-    steps:
-      - name: Publish ${{ matrix.package_name }}
-        uses: zokugun/github-actions-aur-releaser@v1
-        with:
-          package_name: ${{ matrix.package_name }}
-          package_type: ${{ matrix.package_type }}
-          aur_private_key: ${{ secrets.AUR_PRIVATE_KEY }}
-          aur_username: ${{ secrets.AUR_USERNAME }}
-          aur_email: ${{ secrets.AUR_EMAIL }}
-
-  snap:
-    needs:
-      - check
-      - build
-    runs-on: ubuntu-latest
-    env:
-      RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
-      SNAP_NAME: codium
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-        - amd64
-    if: needs.check.outputs.SHOULD_DEPLOY == 'yes' && vars.DISABLE_STABLE_SNAP != 'yes'
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.GITHUB_BRANCH }}
-
-      - name: Switch to relevant branch
-        env:
-          PULL_REQUEST_ID: ${{ github.event.inputs.checkout_pr }}
-        run: ./get_pr.sh
-
-      - name: Check version
-        env:
-          ARCHITECTURE: ${{ matrix.platform }}
-          GENERATE_ASSETS: ${{ github.event.inputs.generate_assets }}
-          SNAPCRAFT_STORE_CHANNEL: ${{ vars.SNAP_STORE_CHANNEL }}
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_LOGIN }}
-        run: ./stores/snapcraft/check_version.sh
-
-      - uses: docker/setup-qemu-action@v3
-        if: env.SHOULD_BUILD == 'yes'
-
-      - uses: diddlesnaps/snapcraft-multiarch-action@v1
-        with:
-          path: stores/snapcraft/stable
-          architecture: ${{ matrix.platform }}
-        id: build
-        if: env.SHOULD_BUILD == 'yes'
-
-      - uses: diddlesnaps/snapcraft-review-action@v1
-        with:
-          snap: ${{ steps.build.outputs.snap }}
-          isClassic: 'true'
-        if: env.SHOULD_DEPLOY_TO_RELEASE == 'yes' || env.SHOULD_DEPLOY_TO_STORE == 'yes'
-
-      - uses: svenstaro/upload-release-action@v2
-        with:
-          repo_name: ${{ env.ASSETS_REPOSITORY }}
-          repo_token: ${{ secrets.STRONGER_GITHUB_TOKEN }}
-          file: ${{ steps.build.outputs.snap }}
-          tag: ${{ env.RELEASE_VERSION }}
-        if: env.SHOULD_DEPLOY_TO_RELEASE == 'yes'
-
-      - uses: snapcore/action-publish@master
-        env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_LOGIN }}
-        with:
-          snap: ${{ steps.build.outputs.snap }}
-          release: ${{ vars.SNAP_STORE_CHANNEL }}
-        if: env.SHOULD_DEPLOY_TO_STORE == 'yes'
-
-  deb-rpm-repo-hook:
-    needs:
-      - check
-      - build
-    runs-on: ubuntu-latest
-    if: needs.check.outputs.SHOULD_DEPLOY == 'yes'
-
-    steps:
-      - name: Trigger repository rebuild
-        env:
-          GL_PAGES_TOKEN: ${{ secrets.GL_PAGES_TOKEN }}
-        run: curl -X POST --fail -F token="${GL_PAGES_TOKEN}" -F ref=master https://gitlab.com/api/v4/projects/8762263/trigger/pipeline
