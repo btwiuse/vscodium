@@ -85,7 +85,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.GITHUB_BRANCH }}
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Switch to relevant branch
         env:
@@ -101,33 +100,32 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
+<<<<<<< HEAD
           node-version: '20.18.1'
         if: env.SHOULD_BUILD == 'yes'
+=======
+          node-version: '20.18'
+>>>>>>> 04a6662 (simplify workflow)
 
       - name: Install Yarn
         run: npm install -g yarn
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Setup Python 3
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Install libkrb5-dev
         run: sudo apt-get update -y && sudo apt-get install -y libkrb5-dev
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Clone VSCode repo
         run: ./get_repo.sh
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Build
         env:
           SHOULD_BUILD_REH: 'no'
           SHOULD_BUILD_REH_WEB: 'no'
         run: ./build.sh
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Compress vscode artifact
         run: |
@@ -135,7 +133,6 @@ jobs:
           # echo "vscode/.build/extensions/node_modules" >> vscode.txt
           echo "vscode/.git" >> vscode.txt
           tar -czf vscode.tar.gz -T vscode.txt
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Upload vscode artifact
         uses: actions/upload-artifact@v4
@@ -155,7 +152,6 @@ jobs:
         include:
         - slug: X64
           vscode_arch: x64
-          npm_arch: x64
           image: vscodium/vscodium-linux-build-agent:focal-x64
     container:
       image: ${{ matrix.image }}
@@ -164,7 +160,6 @@ jobs:
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ (needs.check.outputs.SHOULD_BUILD == 'yes' || github.event.inputs.generate_assets == 'true') && 'yes' || 'no' }}
       SHOULD_DEPLOY: ${{ needs.check.outputs.SHOULD_DEPLOY }}
       VSCODE_ARCH: ${{ matrix.vscode_arch }}
     outputs:
@@ -203,8 +198,12 @@ jobs:
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+<<<<<<< HEAD
           npm_config_arch: ${{ matrix.npm_arch }}
         run: ./build/linux/package_bin.sh
+=======
+        run: ./package_linux_bin.sh
+>>>>>>> 04a6662 (simplify workflow)
 
       - name: Prepare assets
         env:
@@ -243,7 +242,6 @@ jobs:
         include:
         - slug: X64
           vscode_arch: x64
-          npm_arch: x64
     env:
       BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
@@ -300,7 +298,6 @@ jobs:
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          npm_config_arch: ${{ matrix.npm_arch }}
         run: ./build/linux/package_reh.sh
 
       - name: Release
@@ -327,7 +324,6 @@ jobs:
         include:
         - slug: X64
           vscode_arch: x64
-          npm_arch: x64
     env:
       BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
@@ -384,7 +380,6 @@ jobs:
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          npm_config_arch: ${{ matrix.npm_arch }}
         run: ./package_web.sh
 
       - name: Release
@@ -396,7 +391,7 @@ jobs:
       - name: Upload assets
         uses: actions/upload-artifact@v4
         with:
-          name: web-${{ matrix.vscode_arch }}
+          name: web
           path: assets/
           retention-days: 30
 
@@ -409,9 +404,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
+<<<<<<< HEAD
         - slug: X64
           vscode_arch: x64
           npm_arch: x64
+=======
+        - vscode_arch: x64
+>>>>>>> 04a6662 (simplify workflow)
     env:
       BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
       DISABLED: ${{ vars[format('DISABLE_STABLE_ALPINE_REH_{0}', matrix.slug)] }}
@@ -463,8 +462,12 @@ jobs:
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+<<<<<<< HEAD
           npm_config_arch: ${{ matrix.npm_arch }}
         run: ./build/alpine/package_reh.sh
+=======
+        run: ./package_alpine_reh.sh
+>>>>>>> 04a6662 (simplify workflow)
         if: env.DISABLED != 'yes' && (env.SHOULD_BUILD_REH != 'no' || env.SHOULD_BUILD_REH_WEB != 'no' || github.event.inputs.generate_assets == 'true')
 
       - name: Release
