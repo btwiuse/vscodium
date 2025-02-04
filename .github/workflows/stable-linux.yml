@@ -231,6 +231,8 @@ jobs:
         include:
         - slug: X64
           vscode_arch: x64
+        - slug: ARM64
+          vscode_arch: arm64
     env:
       BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
