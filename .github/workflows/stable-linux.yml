@@ -100,12 +100,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-<<<<<<< HEAD
           node-version: '20.18.1'
-        if: env.SHOULD_BUILD == 'yes'
-=======
-          node-version: '20.18'
->>>>>>> 04a6662 (simplify workflow)
 
       - name: Install Yarn
         run: npm install -g yarn
@@ -198,12 +193,7 @@ jobs:
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-<<<<<<< HEAD
-          npm_config_arch: ${{ matrix.npm_arch }}
         run: ./build/linux/package_bin.sh
-=======
-        run: ./package_linux_bin.sh
->>>>>>> 04a6662 (simplify workflow)
 
       - name: Prepare assets
         env:
@@ -406,13 +396,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-<<<<<<< HEAD
         - slug: X64
           vscode_arch: x64
-          npm_arch: x64
-=======
-        - vscode_arch: x64
->>>>>>> 04a6662 (simplify workflow)
     env:
       BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
       DISABLED: ${{ vars[format('DISABLE_STABLE_ALPINE_REH_{0}', matrix.slug)] }}
@@ -464,12 +449,7 @@ jobs:
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-<<<<<<< HEAD
-          npm_config_arch: ${{ matrix.npm_arch }}
         run: ./build/alpine/package_reh.sh
-=======
-        run: ./package_alpine_reh.sh
->>>>>>> 04a6662 (simplify workflow)
         if: env.DISABLED != 'yes' && (env.SHOULD_BUILD_REH != 'no' || env.SHOULD_BUILD_REH_WEB != 'no' || github.event.inputs.generate_assets == 'true')
 
       - name: Release
