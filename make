@@ -12,8 +12,14 @@ cp -v codigo.svg src/stable/src/vs/workbench/browser/media/code-icon.svg
 cp -v codigo.svg icons/insider/
 cp -v codigo.svg icons/stable/
 
+magick convert -background black -density 1200 -resize 512x512 codigo.svg code-512-dark.png
+magick convert -background black -density 1200 -resize 192x192 codigo.svg code-192-dark.png
 magick convert -background white -density 1200 -resize 512x512 codigo.svg code-512.png
 magick convert -background white -density 1200 -resize 192x192 codigo.svg code-192.png
 magick convert -background none -density 1200 -resize 32x32 codigo.svg favicon.ico
 
-cp -v code-512.png code-192.png favicon.ico src/stable/resources/server/
+cp -v code-512-dark.png src/stable/resources/server/
+cp -v code-192-dark.png src/stable/resources/server/
+cp -v code-512.png src/stable/resources/server/
+cp -v code-192.png src/stable/resources/server/
+cp -v favicon.ico  src/stable/resources/server/

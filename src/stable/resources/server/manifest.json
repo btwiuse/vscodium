@@ -9,11 +9,25 @@
 		{
 			"src": "code-192.png",
 			"type": "image/png",
+			"color_scheme": "light",
 			"sizes": "192x192"
 		},
 		{
 			"src": "code-512.png",
 			"type": "image/png",
+			"color_scheme": "light",
+			"sizes": "512x512"
+		},
+		{
+			"src": "code-192-dark.png",
+			"type": "image/png",
+			"color_scheme": "dark",
+			"sizes": "192x192"
+		},
+		{
+			"src": "code-512-dark.png",
+			"type": "image/png",
+			"color_scheme": "dark",
 			"sizes": "512x512"
 		}
 	]
