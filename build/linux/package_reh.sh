@@ -142,7 +142,7 @@ if [[ -z "${VSCODE_SKIP_SETUPENV}" ]]; then
   if [[ -n "${VSCODE_SKIP_SYSROOT}" ]]; then
     source ./build/azure-pipelines/linux/setup-env.sh --skip-sysroot
   else
-    source ./build/azure-pipelines/linux/setup-env.sh
+    source ./build/azure-pipelines/linux/setup-env.sh --skip-sysroot
   fi
 fi
 
