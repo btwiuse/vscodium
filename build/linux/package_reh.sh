@@ -15,16 +15,12 @@ tar -xzf ./vscode.tar.gz
 
 cd vscode || { echo "'vscode' dir not found"; exit 1; }
 
-GLIBC_VERSION="2.28"
-GLIBCXX_VERSION="3.4.26"
 NODE_VERSION="20.18.1"
 
 export VSCODE_NODEJS_URLROOT='/download/release'
 export VSCODE_NODEJS_URLSUFFIX=''
 
 if [[ "${VSCODE_ARCH}" == "x64" ]]; then
-  # GLIBC_VERSION="2.17"
-  # GLIBCXX_VERSION="3.4.22"
   VSCODE_REMOTE_DEPENDENCIES_CONTAINER_NAME="vscodium/vscodium-linux-build-agent:centos7-devtoolset8-${VSCODE_ARCH}"
 
   export VSCODE_NODEJS_SITE='https://unofficial-builds.nodejs.org'
@@ -74,7 +70,6 @@ fi
 
 export VSCODE_PLATFORM='linux'
 export VSCODE_SKIP_NODE_VERSION_CHECK=1
-export VSCODE_SYSROOT_PREFIX="-glibc-${GLIBC_VERSION}"
 
 VSCODE_HOST_MOUNT="$( pwd )"
 
@@ -138,14 +133,6 @@ for i in {1..5}; do # try 5 times
   echo "Npm install failed $i, trying again..."
 done
 
-if [[ -z "${VSCODE_SKIP_SETUPENV}" ]]; then
-  if [[ -n "${VSCODE_SKIP_SYSROOT}" ]]; then
-    source ./build/azure-pipelines/linux/setup-env.sh --skip-sysroot
-  else
-    source ./build/azure-pipelines/linux/setup-env.sh --skip-sysroot
-  fi
-fi
-
 for i in {1..5}; do # try 5 times
   npm ci && break
   if [[ $i == 3 ]]; then
@@ -155,17 +142,11 @@ for i in {1..5}; do # try 5 times
   echo "Npm install failed $i, trying again..."
 done
 
-node build/azure-pipelines/distro/mixin-npm
-
-export VSCODE_NODE_GLIBC="-glibc-${GLIBC_VERSION}"
-
 if [[ "${SHOULD_BUILD_REH}" != "no" ]]; then
   echo "Building REH"
   # yarn gulp minify-vscode-reh
   # yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
   yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
-
-  EXPECTED_GLIBC_VERSION="${GLIBC_VERSION}" EXPECTED_GLIBCXX_VERSION="${GLIBCXX_VERSION}" SEARCH_PATH="../vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}" ./build/azure-pipelines/linux/verify-glibc-requirements.sh
 
   pushd "../vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
 
@@ -184,8 +165,6 @@ if [[ "${SHOULD_BUILD_REH_WEB}" != "no" ]]; then
   # yarn gulp minify-vscode-reh-web
   # yarn gulp "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
   yarn gulp "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
-
-  EXPECTED_GLIBC_VERSION="${GLIBC_VERSION}" EXPECTED_GLIBCXX_VERSION="${GLIBCXX_VERSION}" SEARCH_PATH="../vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}" ./build/azure-pipelines/linux/verify-glibc-requirements.sh
 
   pushd "../vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
 
