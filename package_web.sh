@@ -44,6 +44,18 @@ for i in {1..5}; do # try 5 times
   echo "Npm install failed $i, trying again..."
 done
 
+if [[ "${SHOULD_BUILD_WEB_ONLY}" != "no" ]]; then
+  echo "Building WEB Only"
+  yarn gulp vscode-web-only
+
+  pushd "../vscode-web-only"
+
+  echo "Archiving WEB Only"
+  tar czf "../assets/${APP_NAME_LC}-web-only-${RELEASE_VERSION}.tar.gz" .
+
+  popd
+fi
+
 if [[ "${SHOULD_BUILD_WEB}" != "no" ]]; then
   echo "Building WEB"
   yarn gulp vscode-web
@@ -54,18 +66,6 @@ if [[ "${SHOULD_BUILD_WEB}" != "no" ]]; then
 
   echo "Archiving WEB"
   tar czf "../assets/${APP_NAME_LC}-web-${RELEASE_VERSION}.tar.gz" .
-
-  popd
-fi
-
-if [[ "${SHOULD_BUILD_WEB_ONLY}" != "no" ]]; then
-  echo "Building WEB Only"
-  yarn gulp vscode-web-only
-
-  pushd "../vscode-web-only"
-
-  echo "Archiving WEB Only"
-  tar czf "../assets/${APP_NAME_LC}-web-only-${RELEASE_VERSION}.tar.gz" .
 
   popd
 fi
