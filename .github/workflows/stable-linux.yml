@@ -70,7 +70,6 @@ jobs:
   compile:
     needs:
       - check
-    # important! we need to run on ubuntu-20.04 to build the tarball
     runs-on: ubuntu-20.04
     env:
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
@@ -232,11 +231,11 @@ jobs:
         include:
         - slug: X64
           vscode_arch: x64
-          os: ubuntu-24.04
+          os: ubuntu-20.04
           gh_arch: amd64
         - slug: ARM64
           vscode_arch: arm64
-          os: ubuntu-24.04-arm
+          os: ubuntu-22.04-arm
           gh_arch: arm64
     env:
       BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
