@@ -2,7 +2,7 @@
 
 set -ex
 
-GH_ARCH="amd64"
+GH_ARCH="${1:-amd64}"
 
 TAG=$( curl --retry 12 --retry-delay 30 "https://api.github.com/repos/cli/cli/releases/latest" | jq --raw-output '.tag_name' )
 VERSION=${TAG#v}
