@@ -27,7 +27,7 @@ if [[ -z "${RELEASE_VERSION}" ]]; then
     fi
   fi
 
-  date=$( date +%Y%j )
+  date=$( env TZ=Asia/Taipei date +%y%j )
 
   if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
     RELEASE_VERSION="${MS_TAG}.${date: -5}-insider"
