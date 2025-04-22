@@ -35,7 +35,7 @@ jobs:
       MS_TAG: ${{ env.MS_TAG }}
       RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
       SHOULD_BUILD: 'yes'
-      SHOULD_DEPLOY: ${{ env.SHOULD_DEPLOY }}
+      SHOULD_DEPLOY: 'yes'
 
     steps:
       - uses: actions/checkout@v4
@@ -69,7 +69,7 @@ jobs:
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ (needs.check.outputs.SHOULD_BUILD == 'yes') && 'yes' || 'no' }}
+      SHOULD_BUILD: 'yes'
       VSCODE_ARCH: 'x64'
     outputs:
       BUILD_SOURCEVERSION: ${{ env.BUILD_SOURCEVERSION }}
@@ -151,8 +151,8 @@ jobs:
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ needs.check.outputs.SHOULD_BUILD }}
-      SHOULD_DEPLOY: ${{ needs.check.outputs.SHOULD_DEPLOY }}
+      SHOULD_BUILD: 'yes'
+      SHOULD_DEPLOY: 'yes'
       VSCODE_ARCH: ${{ matrix.vscode_arch }}
     if: needs.check.outputs.SHOULD_BUILD == 'yes'
 
@@ -233,8 +233,8 @@ jobs:
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ needs.check.outputs.SHOULD_BUILD }}
-      SHOULD_DEPLOY: ${{ needs.check.outputs.SHOULD_DEPLOY }}
+      SHOULD_BUILD: 'yes'
+      SHOULD_DEPLOY: 'yes'
       VSCODE_ARCH: ${{ matrix.vscode_arch }}
     if: needs.check.outputs.SHOULD_BUILD == 'yes'
 
