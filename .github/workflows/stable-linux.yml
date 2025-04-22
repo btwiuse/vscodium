@@ -4,18 +4,10 @@ on:
   schedule:
     - cron: '30 16 * * *'  # ⏰ Everyday 00:30 AM UTC+8
     - cron: '30 00 * * *'  # ⏰ Everyday 08:30 AM UTC+8
-    - cron: '20 06 * * *'
+    - cron: '30 06 * * *'
     - cron: '30 08 * * *'  # ⏰ Everyday 16:30 PM UTC+8
   workflow_dispatch:
     inputs:
-      force_version:
-        type: boolean
-        description: Force update version
-        default: true
-      generate_assets:
-        type: boolean
-        description: Generate assets
-        default: true
       checkout_pr:
         type: string
         description: Checkout PR
@@ -65,7 +57,7 @@ jobs:
 
       - name: Check PR or cron
         env:
-          GENERATE_ASSETS: ${{ github.event.inputs.generate_assets }}
+          GENERATE_ASSETS: true
         run: ./check_cron_or_pr.sh
 
       - name: Check existing VSCodium tags/releases
@@ -82,7 +74,7 @@ jobs:
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ (needs.check.outputs.SHOULD_BUILD == 'yes' || github.event.inputs.generate_assets == 'true') && 'yes' || 'no' }}
+      SHOULD_BUILD: ${{ (needs.check.outputs.SHOULD_BUILD == 'yes') && 'yes' || 'no' }}
       VSCODE_ARCH: 'x64'
     outputs:
       BUILD_SOURCEVERSION: ${{ env.BUILD_SOURCEVERSION }}
@@ -167,7 +159,7 @@ jobs:
       SHOULD_BUILD: ${{ needs.check.outputs.SHOULD_BUILD }}
       SHOULD_DEPLOY: ${{ needs.check.outputs.SHOULD_DEPLOY }}
       VSCODE_ARCH: ${{ matrix.vscode_arch }}
-    if: needs.check.outputs.SHOULD_BUILD == 'yes' || github.event.inputs.generate_assets == 'true'
+    if: needs.check.outputs.SHOULD_BUILD == 'yes'
 
     steps:
       - uses: actions/checkout@v4
@@ -249,7 +241,7 @@ jobs:
       SHOULD_BUILD: ${{ needs.check.outputs.SHOULD_BUILD }}
       SHOULD_DEPLOY: ${{ needs.check.outputs.SHOULD_DEPLOY }}
       VSCODE_ARCH: ${{ matrix.vscode_arch }}
-    if: needs.check.outputs.SHOULD_BUILD == 'yes' || github.event.inputs.generate_assets == 'true'
+    if: needs.check.outputs.SHOULD_BUILD == 'yes'
 
     steps:
       - uses: actions/checkout@v4
