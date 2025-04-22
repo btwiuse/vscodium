@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '30 16 * * *'  # ⏰ Everyday 00:30 AM UTC+8
     - cron: '30 00 * * *'  # ⏰ Everyday 08:30 AM UTC+8
-    - cron: '00 04 * * *'
+    - cron: '20 06 * * *'
     - cron: '30 08 * * *'  # ⏰ Everyday 16:30 PM UTC+8
   workflow_dispatch:
     inputs:
