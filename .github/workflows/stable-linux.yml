@@ -10,9 +10,11 @@ on:
       force_version:
         type: boolean
         description: Force update version
+        default: true
       generate_assets:
         type: boolean
         description: Generate assets
+        default: true
       checkout_pr:
         type: string
         description: Checkout PR
