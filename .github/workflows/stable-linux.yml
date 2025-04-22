@@ -34,7 +34,7 @@ jobs:
       MS_COMMIT: ${{ env.MS_COMMIT }}
       MS_TAG: ${{ env.MS_TAG }}
       RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
+      SHOULD_BUILD: 'yes'
       SHOULD_DEPLOY: ${{ env.SHOULD_DEPLOY }}
 
     steps:
