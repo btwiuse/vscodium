@@ -64,25 +64,19 @@ if [[ "${OS_NAME}" == "osx" ]]; then
     cd ..
   fi
 
-  if [[ "${SHOULD_BUILD_ZIP}" != "no" ]]; then
-    echo "Building and moving ZIP"
-    cd "VSCode-darwin-${VSCODE_ARCH}"
-    zip -r -X -y "../assets/${APP_NAME}-darwin-${VSCODE_ARCH}-${RELEASE_VERSION}.zip" ./*.app
-    cd ..
-  fi
+  echo "Building and moving ZIP"
+  cd "VSCode-darwin-${VSCODE_ARCH}"
+  zip -r -X -y "../assets/${APP_NAME}-darwin-${VSCODE_ARCH}-${RELEASE_VERSION}.zip" ./*.app
+  cd ..
 
-  if [[ "${SHOULD_BUILD_DMG}" != "no" ]]; then
-    echo "Building and moving DMG"
-    pushd "VSCode-darwin-${VSCODE_ARCH}"
-    npx create-dmg ./*.app .
-    mv ./*.dmg "../assets/${APP_NAME}.${VSCODE_ARCH}.${RELEASE_VERSION}.dmg"
-    popd
-  fi
+  echo "Building and moving DMG"
+  pushd "VSCode-darwin-${VSCODE_ARCH}"
+  npx create-dmg ./*.app .
+  mv ./*.dmg "../assets/${APP_NAME}.${VSCODE_ARCH}.${RELEASE_VERSION}.dmg"
+  popd
 
-  if [[ "${SHOULD_BUILD_SRC}" == "yes" ]]; then
-    git archive --format tar.gz --output="./assets/${APP_NAME}-${RELEASE_VERSION}-src.tar.gz" HEAD
-    git archive --format zip --output="./assets/${APP_NAME}-${RELEASE_VERSION}-src.zip" HEAD
-  fi
+  git archive --format tar.gz --output="./assets/${APP_NAME}-${RELEASE_VERSION}-src.tar.gz" HEAD
+  git archive --format zip --output="./assets/${APP_NAME}-${RELEASE_VERSION}-src.zip" HEAD
 
   if [[ -n "${CERTIFICATE_OSX_P12_DATA}" ]]; then
     echo "+ clean"
@@ -97,123 +91,81 @@ elif [[ "${OS_NAME}" == "windows" ]]; then
 
   yarn gulp "vscode-win32-${VSCODE_ARCH}-inno-updater"
 
-  if [[ "${SHOULD_BUILD_ZIP}" != "no" ]]; then
-    7z.exe a -tzip "../assets/${APP_NAME}-win32-${VSCODE_ARCH}-${RELEASE_VERSION}.zip" -x!CodeSignSummary*.md -x!tools "../VSCode-win32-${VSCODE_ARCH}/*" -r
-  fi
+  7z.exe a -tzip "../assets/${APP_NAME}-win32-${VSCODE_ARCH}-${RELEASE_VERSION}.zip" -x!CodeSignSummary*.md -x!tools "../VSCode-win32-${VSCODE_ARCH}/*" -r
 
-  if [[ "${SHOULD_BUILD_EXE_SYS}" != "no" ]]; then
-    yarn gulp "vscode-win32-${VSCODE_ARCH}-system-setup"
-  fi
+  yarn gulp "vscode-win32-${VSCODE_ARCH}-system-setup"
 
-  if [[ "${SHOULD_BUILD_EXE_USR}" != "no" ]]; then
-    yarn gulp "vscode-win32-${VSCODE_ARCH}-user-setup"
-  fi
+  yarn gulp "vscode-win32-${VSCODE_ARCH}-user-setup"
 
   if [[ "${VSCODE_ARCH}" == "ia32" || "${VSCODE_ARCH}" == "x64" ]]; then
-    if [[ "${SHOULD_BUILD_MSI}" != "no" ]]; then
-      . ../build/windows/msi/build.sh
-    fi
+    . ../build/windows/msi/build.sh
 
-    if [[ "${SHOULD_BUILD_MSI_NOUP}" != "no" ]]; then
-      . ../build/windows/msi/build-updates-disabled.sh
-    fi
+    . ../build/windows/msi/build-updates-disabled.sh
   fi
 
   cd ..
 
-  if [[ "${SHOULD_BUILD_EXE_SYS}" != "no" ]]; then
-    echo "Moving System EXE"
-    mv "vscode\\.build\\win32-${VSCODE_ARCH}\\system-setup\\VSCodeSetup.exe" "assets\\${APP_NAME}Setup-${VSCODE_ARCH}-${RELEASE_VERSION}.exe"
-  fi
+  echo "Moving System EXE"
+  mv "vscode\\.build\\win32-${VSCODE_ARCH}\\system-setup\\VSCodeSetup.exe" "assets\\${APP_NAME}Setup-${VSCODE_ARCH}-${RELEASE_VERSION}.exe"
 
-  if [[ "${SHOULD_BUILD_EXE_USR}" != "no" ]]; then
-    echo "Moving User EXE"
-    mv "vscode\\.build\\win32-${VSCODE_ARCH}\\user-setup\\VSCodeSetup.exe" "assets\\${APP_NAME}UserSetup-${VSCODE_ARCH}-${RELEASE_VERSION}.exe"
-  fi
+  echo "Moving User EXE"
+  mv "vscode\\.build\\win32-${VSCODE_ARCH}\\user-setup\\VSCodeSetup.exe" "assets\\${APP_NAME}UserSetup-${VSCODE_ARCH}-${RELEASE_VERSION}.exe"
 
   if [[ "${VSCODE_ARCH}" == "ia32" || "${VSCODE_ARCH}" == "x64" ]]; then
-    if [[ "${SHOULD_BUILD_MSI}" != "no" ]]; then
-      echo "Moving MSI"
-      mv "build\\windows\\msi\\releasedir\\${APP_NAME}-${VSCODE_ARCH}-${RELEASE_VERSION}.msi" assets/
-    fi
+    echo "Moving MSI"
+    mv "build\\windows\\msi\\releasedir\\${APP_NAME}-${VSCODE_ARCH}-${RELEASE_VERSION}.msi" assets/
 
-    if [[ "${SHOULD_BUILD_MSI_NOUP}" != "no" ]]; then
-      echo "Moving MSI with disabled updates"
-      mv "build\\windows\\msi\\releasedir\\${APP_NAME}-${VSCODE_ARCH}-updates-disabled-${RELEASE_VERSION}.msi" assets/
-    fi
+    echo "Moving MSI with disabled updates"
+    mv "build\\windows\\msi\\releasedir\\${APP_NAME}-${VSCODE_ARCH}-updates-disabled-${RELEASE_VERSION}.msi" assets/
   fi
 
   VSCODE_PLATFORM="win32"
 else
   cd vscode || { echo "'vscode' dir not found"; exit 1; }
 
-  if [[ "${SHOULD_BUILD_APPIMAGE}" != "no" && "${VSCODE_ARCH}" != "x64" ]]; then
+  if [[ "${VSCODE_ARCH}" != "x64" ]]; then
     SHOULD_BUILD_APPIMAGE="no"
   fi
 
-  if [[ "${SHOULD_BUILD_DEB}" != "no" || "${SHOULD_BUILD_APPIMAGE}" != "no" ]]; then
-    yarn gulp "vscode-linux-${VSCODE_ARCH}-build-deb"
-  fi
+  yarn gulp "vscode-linux-${VSCODE_ARCH}-build-deb"
 
-  if [[ "${SHOULD_BUILD_RPM}" != "no" ]]; then
-    yarn gulp "vscode-linux-${VSCODE_ARCH}-build-rpm"
-  fi
+  yarn gulp "vscode-linux-${VSCODE_ARCH}-build-rpm"
 
-  if [[ "${SHOULD_BUILD_APPIMAGE}" != "no" ]]; then
-    . ../build/linux/appimage/build.sh
-  fi
+  . ../build/linux/appimage/build.sh
 
   cd ..
 
-  if [[ "${CI_BUILD}" == "no" ]]; then
-    . ./stores/snapcraft/build.sh
+  . ./stores/snapcraft/build.sh
 
-    if [[ "${SKIP_ASSETS}" == "no" ]]; then
-      mv stores/snapcraft/build/*.snap assets/
-    fi
-  fi
+  mv stores/snapcraft/build/*.snap assets/
 
-  if [[ "${SHOULD_BUILD_TAR}" != "no" ]]; then
-    echo "Building and moving TAR"
-    cd "VSCode-linux-${VSCODE_ARCH}"
-    tar czf "../assets/${APP_NAME}-linux-${VSCODE_ARCH}-${RELEASE_VERSION}.tar.gz" .
-    cd ..
-  fi
+  echo "Building and moving TAR"
+  cd "VSCode-linux-${VSCODE_ARCH}"
+  tar czf "../assets/${APP_NAME}-linux-${VSCODE_ARCH}-${RELEASE_VERSION}.tar.gz" .
+  cd ..
 
-  if [[ "${SHOULD_BUILD_DEB}" != "no" ]]; then
-    echo "Moving DEB"
-    mv vscode/.build/linux/deb/*/deb/*.deb assets/
-  fi
+  echo "Moving DEB"
+  mv vscode/.build/linux/deb/*/deb/*.deb assets/
 
-  if [[ "${SHOULD_BUILD_RPM}" != "no" ]]; then
-    echo "Moving RPM"
-    mv vscode/.build/linux/rpm/*/*.rpm assets/
-  fi
+  echo "Moving RPM"
+  mv vscode/.build/linux/rpm/*/*.rpm assets/
 
-  if [[ "${SHOULD_BUILD_APPIMAGE}" != "no" ]]; then
-    echo "Moving AppImage"
-    mv build/linux/appimage/out/*.AppImage* assets/
+  echo "Moving AppImage"
+  mv build/linux/appimage/out/*.AppImage* assets/
 
-    find assets -name '*.AppImage*' -exec bash -c 'mv $0 ${0/_-_/-}' {} \;
-  fi
+  find assets -name '*.AppImage*' -exec bash -c 'mv $0 ${0/_-_/-}' {} \;
 
   VSCODE_PLATFORM="linux"
 fi
 
-if [[ "${SHOULD_BUILD_REH}" != "no" ]]; then
-  echo "Building and moving REH"
-  cd "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
-  tar czf "../assets/${APP_NAME_LC}-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-${RELEASE_VERSION}.tar.gz" .
-  cd ..
-fi
+echo "Building and moving REH"
+cd "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
+tar czf "../assets/${APP_NAME_LC}-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-${RELEASE_VERSION}.tar.gz" .
+cd ..
 
-if [[ "${SHOULD_BUILD_REH_WEB}" != "no" ]]; then
-  echo "Building and moving REH-web"
-  cd "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
-  tar czf "../assets/${APP_NAME_LC}-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}-${RELEASE_VERSION}.tar.gz" .
-  cd ..
-fi
+echo "Building and moving REH-web"
+cd "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
+tar czf "../assets/${APP_NAME_LC}-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}-${RELEASE_VERSION}.tar.gz" .
+cd ..
 
-if [[ "${OS_NAME}" != "windows" ]]; then
-  ./prepare_checksums.sh
-fi
+./prepare_checksums.sh

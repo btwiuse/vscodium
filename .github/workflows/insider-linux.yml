@@ -41,8 +41,6 @@ jobs:
       MS_COMMIT: ${{ env.MS_COMMIT }}
       MS_TAG: ${{ env.MS_TAG }}
       RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
-      SHOULD_DEPLOY: ${{ env.SHOULD_DEPLOY }}
 
     steps:
       - uses: actions/checkout@v4
@@ -76,7 +74,6 @@ jobs:
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ (needs.check.outputs.SHOULD_BUILD == 'yes' || github.event.inputs.generate_assets == 'true') && 'yes' || 'no' }}
       VSCODE_ARCH: 'x64'
     outputs:
       BUILD_SOURCEVERSION: ${{ env.BUILD_SOURCEVERSION }}
@@ -85,7 +82,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.GITHUB_BRANCH }}
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Switch to relevant branch
         env:
@@ -102,32 +98,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.18'
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Install Yarn
         run: npm install -g yarn
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Setup Python 3
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Install libkrb5-dev
         run: sudo apt-get update -y && sudo apt-get install -y libkrb5-dev
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Clone VSCode repo
         run: ./get_repo.sh
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Build
         env:
           SHOULD_BUILD_REH: 'no'
           SHOULD_BUILD_REH_WEB: 'no'
         run: ./build.sh
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Compress vscode artifact
         run: |
@@ -135,15 +125,13 @@ jobs:
           echo "vscode/.build/extensions/node_modules" >> vscode.txt
           echo "vscode/.git" >> vscode.txt
           tar -czf vscode.tar.gz -T vscode.txt
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Upload vscode artifact
         uses: actions/upload-artifact@v4
         with:
           name: vscode
           path: ./vscode.tar.gz
-          retention-days: ${{ needs.check.outputs.SHOULD_DEPLOY == 'yes' && 30 || 1 }}
-        if: env.SHOULD_BUILD == 'yes'
+          retention-days: 30
 
   build:
     needs:
@@ -186,19 +174,13 @@ jobs:
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ (needs.check.outputs.SHOULD_BUILD == 'yes' || github.event.inputs.generate_assets == 'true') && 'yes' || 'no' }}
-      SHOULD_DEPLOY: ${{ needs.check.outputs.SHOULD_DEPLOY }}
       VSCODE_ARCH: ${{ matrix.vscode_arch }}
-    outputs:
-      RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
-      SHOULD_DEPLOY: ${{ env.SHOULD_DEPLOY }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.GITHUB_BRANCH }}
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes'
+        if: env.DISABLED != 'yes'
 
       - name: Switch to relevant branch
         env:
@@ -208,7 +190,7 @@ jobs:
 
       - name: Install GH
         run: ./install_gh.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes' && env.SHOULD_DEPLOY == 'yes'
+        if: env.DISABLED != 'yes' && env.SHOULD_DEPLOY == 'yes'
 
       - name: Check existing VSCodium tags/releases
         env:
@@ -216,38 +198,38 @@ jobs:
           DISABLE_APPIMAGE: ${{ vars.DISABLE_INSIDER_APPIMAGE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./check_tags.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes'
+        if: env.DISABLED != 'yes'
 
       - name: Install libkrb5-dev
         run: sudo apt-get update -y && sudo apt-get install -y libkrb5-dev
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes'
+        if: env.DISABLED != 'yes'
 
       - name: Download vscode artifact
         uses: actions/download-artifact@v4
         with:
           name: vscode
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes'
+        if: env.DISABLED != 'yes'
 
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           npm_config_arch: ${{ matrix.npm_arch }}
         run: ./package_linux_bin.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes'
+        if: env.DISABLED != 'yes'
 
       - name: Prepare assets
         env:
           SHOULD_BUILD_REH: 'no'
           SHOULD_BUILD_REH_WEB: 'no'
         run: ./prepare_assets.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes' && (env.SHOULD_DEPLOY == 'yes' || github.event.inputs.generate_assets == 'true')
+        if: env.DISABLED != 'yes'
 
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
           GITHUB_USERNAME: ${{ github.repository_owner }}
         run: ./release.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes' && env.SHOULD_DEPLOY == 'yes'
+        if: env.DISABLED != 'yes'
 
       - name: Update versions repo
         env:
@@ -255,7 +237,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
           GITHUB_USERNAME: ${{ github.repository_owner }}
         run: ./update_version.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes' && env.SHOULD_DEPLOY == 'yes'
+        if: env.DISABLED != 'yes'
 
       - name: Upload assets
         uses: actions/upload-artifact@v4
@@ -263,7 +245,7 @@ jobs:
           name: bin-${{ matrix.vscode_arch }}
           path: assets/
           retention-days: 3
-        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes' && env.SHOULD_DEPLOY == 'no' && github.event.inputs.generate_assets == 'true'
+        if: env.DISABLED != 'yes'
 
   reh_linux:
     needs:
@@ -301,10 +283,7 @@ jobs:
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ needs.check.outputs.SHOULD_BUILD }}
-      SHOULD_DEPLOY: ${{ needs.check.outputs.SHOULD_DEPLOY }}
       VSCODE_ARCH: ${{ matrix.vscode_arch }}
-    if: needs.check.outputs.SHOULD_BUILD == 'yes' || github.event.inputs.generate_assets == 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -343,7 +322,7 @@ jobs:
 
       - name: Install GH
         run: ./install_gh.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_DEPLOY == 'yes'
+        if: env.DISABLED != 'yes'
 
       - name: Check existing VSCodium tags/releases
         env:
@@ -356,21 +335,21 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vscode
-        if: env.DISABLED != 'yes' && (env.SHOULD_BUILD_REH != 'no' || env.SHOULD_BUILD_REH_WEB != 'no' || github.event.inputs.generate_assets == 'true')
+        if: env.DISABLED != 'yes'
 
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           npm_config_arch: ${{ matrix.npm_arch }}
         run: ./package_linux_reh.sh
-        if: env.DISABLED != 'yes' && (env.SHOULD_BUILD_REH != 'no' || env.SHOULD_BUILD_REH_WEB != 'no' || github.event.inputs.generate_assets == 'true')
+        if: env.DISABLED != 'yes'
 
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
           GITHUB_USERNAME: ${{ github.repository_owner }}
         run: ./release.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_DEPLOY == 'yes' && (env.SHOULD_BUILD_REH != 'no' || env.SHOULD_BUILD_REH_WEB != 'no')
+        if: env.DISABLED != 'yes'
 
       - name: Upload assets
         uses: actions/upload-artifact@v4
@@ -378,7 +357,7 @@ jobs:
           name: reh-linux-${{ matrix.vscode_arch }}
           path: assets/
           retention-days: 3
-        if: env.DISABLED != 'yes' && env.SHOULD_DEPLOY == 'no' && github.event.inputs.generate_assets == 'true'
+        if: env.DISABLED != 'yes'
 
   reh_alpine:
     needs:
@@ -400,10 +379,7 @@ jobs:
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       OS_NAME: alpine
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ needs.check.outputs.SHOULD_BUILD }}
-      SHOULD_DEPLOY: ${{ needs.check.outputs.SHOULD_DEPLOY }}
       VSCODE_ARCH: ${{ matrix.vscode_arch }}
-    if: needs.check.outputs.SHOULD_BUILD == 'yes' || github.event.inputs.generate_assets == 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -423,7 +399,6 @@ jobs:
 
       - name: Install GH
         run: ./install_gh.sh
-        if: env.SHOULD_DEPLOY == 'yes'
 
       - name: Check existing VSCodium tags/releases
         env:
@@ -433,27 +408,23 @@ jobs:
 
       - name: Install libkrb5-dev
         run: sudo apt-get update -y && sudo apt-get install -y libkrb5-dev
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Download vscode artifact
         uses: actions/download-artifact@v4
         with:
           name: vscode
-        if: env.DISABLED != 'yes' && (env.SHOULD_BUILD_REH != 'no' || env.SHOULD_BUILD_REH_WEB != 'no' || github.event.inputs.generate_assets == 'true')
 
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           npm_config_arch: ${{ matrix.npm_arch }}
         run: ./package_alpine_reh.sh
-        if: env.DISABLED != 'yes' && (env.SHOULD_BUILD_REH != 'no' || env.SHOULD_BUILD_REH_WEB != 'no' || github.event.inputs.generate_assets == 'true')
 
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
           GITHUB_USERNAME: ${{ github.repository_owner }}
         run: ./release.sh
-        if: env.DISABLED != 'yes' && env.SHOULD_DEPLOY == 'yes' && (env.SHOULD_BUILD_REH != 'no' || env.SHOULD_BUILD_REH_WEB != 'no')
 
       - name: Upload assets
         uses: actions/upload-artifact@v4
@@ -461,7 +432,6 @@ jobs:
           name: reh-alpine-${{ matrix.vscode_arch }}
           path: assets/
           retention-days: 3
-        if: env.DISABLED != 'yes' && env.SHOULD_DEPLOY == 'no' && github.event.inputs.generate_assets == 'true'
 
   aur:
     needs:
@@ -474,7 +444,6 @@ jobs:
         include:
         - package_name: vscodium-insiders-bin
         - package_name: vscodium-insiders
-    if: needs.check.outputs.SHOULD_DEPLOY == 'yes' && github.event.inputs.generate_assets != 'true'
 
     steps:
       - name: Get version
@@ -505,7 +474,6 @@ jobs:
         platform:
         - amd64
         - arm64
-    if: needs.check.outputs.SHOULD_DEPLOY == 'yes' && vars.DISABLE_INSIDER_SNAP != 'yes'
 
     steps:
       - uses: actions/checkout@v4
