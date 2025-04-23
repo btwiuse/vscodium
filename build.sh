@@ -16,7 +16,7 @@ export NODE_OPTIONS="--max-old-space-size=8192"
 yarn monaco-compile-check
 yarn valid-layers-check
 
-# yarn gulp compile-build
+yarn gulp compile-build-without-mangling
 # yarn gulp compile-extension-media
 # yarn gulp compile-extensions-build
 # yarn gulp minify-vscode
