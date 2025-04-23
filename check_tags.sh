@@ -17,6 +17,8 @@ APP_NAME_LC="$( echo "${APP_NAME}" | awk '{print tolower($0)}' )"
 
 GITHUB_RESPONSE=$( curl -s -H "Authorization: token ${GITHUB_TOKEN}" "https://api.${GH_HOST}/repos/${ASSETS_REPOSITORY}/releases/latest" )
 LATEST_VERSION=$( echo "${GITHUB_RESPONSE}" | jq -c -r '.tag_name' )
+date=$( env TZ=Asia/Taipei date +%y%j )
+RELEASE_VERSION="${MS_TAG}.${date: -5}"
 
 if [[ "${LATEST_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-9]+) ]]; then
   if [[ "${MS_TAG}" != "${BASH_REMATCH[1]}" ]]; then
@@ -33,7 +35,6 @@ if [[ "${LATEST_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-9]+) ]]; then
     fi
   fi
 
-  export RELEASE_VERSION="${LATEST_VERSION}"
   echo "RELEASE_VERSION=${RELEASE_VERSION}" >> "${GITHUB_ENV}"
 
   echo "Switch to release version: ${RELEASE_VERSION}"
