@@ -30,6 +30,8 @@ env:
 jobs:
   check:
     runs-on: ubuntu-24.04
+    container:
+      image: btwiuse/arch:vscode-base
     outputs:
       MS_COMMIT: ${{ env.MS_COMMIT }}
       MS_TAG: ${{ env.MS_TAG }}
@@ -63,6 +65,8 @@ jobs:
     needs:
       - check
     runs-on: ubuntu-22.04
+    container:
+      image: btwiuse/arch:vscode-base
     env:
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
@@ -80,28 +84,6 @@ jobs:
         env:
           PULL_REQUEST_ID: ${{ github.event.inputs.checkout_pr }}
         run: ./get_pr.sh
-
-      - name: Setup GCC
-        uses: egor-tensin/setup-gcc@v1
-        with:
-          version: 10
-          platform: x64
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.18'
-
-      - name: Install Yarn
-        run: npm install -g yarn
-
-      - name: Setup Python 3
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install libkrb5-dev
-        run: sudo apt-get update -y && sudo apt-get install -y libkrb5-dev
 
       - name: Clone VSCode repo
         run: ./get_repo.sh
@@ -131,6 +113,8 @@ jobs:
       - check
       - compile
     runs-on: ${{ matrix.os }}
+    container:
+      image: btwiuse/arch:vscode-base
     strategy:
       fail-fast: false
       matrix:
@@ -159,25 +143,6 @@ jobs:
         env:
           PULL_REQUEST_ID: ${{ github.event.inputs.checkout_pr }}
         run: ./get_pr.sh
-
-      - name: Setup GCC
-        uses: egor-tensin/setup-gcc@v1
-        with:
-          version: 10
-          platform: x64
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.18'
-
-      - name: Setup Python 3
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install libkrb5-dev
-        run: sudo apt-get update -y && sudo apt-get install -y libkrb5-dev
 
       - name: Install GH
         run: ./install_gh.sh ${{ matrix.gh_arch }}
@@ -216,6 +181,8 @@ jobs:
       - check
       - compile
     runs-on: ubuntu-22.04
+    container:
+      image: btwiuse/arch:vscode-base
     strategy:
       fail-fast: false
       matrix:
@@ -238,25 +205,6 @@ jobs:
         env:
           PULL_REQUEST_ID: ${{ github.event.inputs.checkout_pr }}
         run: ./get_pr.sh
-
-      - name: Setup GCC
-        uses: egor-tensin/setup-gcc@v1
-        with:
-          version: 10
-          platform: x64
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.18'
-
-      - name: Setup Python 3
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install libkrb5-dev
-        run: sudo apt-get update -y && sudo apt-get install -y libkrb5-dev
 
       - name: Install GH
         run: ./install_gh.sh
