@@ -11,7 +11,7 @@ APP_NAME_LC="$( echo "${APP_NAME}" | awk '{print tolower($0)}' )"
 
 mkdir -p assets
 
-tar -xzf ./vscode.tar.gz
+[[ -f ./vscode.tar.gz ]] || tar -xzf ./vscode.tar.gz
 
 cd vscode || { echo "'vscode' dir not found"; exit 1; }
 

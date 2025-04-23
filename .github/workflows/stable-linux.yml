@@ -29,7 +29,7 @@ env:
 
 jobs:
   check:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     container:
       image: btwiuse/arch:vscode-base
     outputs:
@@ -64,7 +64,7 @@ jobs:
   compile:
     needs:
       - check
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     container:
       image: btwiuse/arch:vscode-base
     env:
@@ -111,8 +111,8 @@ jobs:
   reh_linux:
     needs:
       - check
-      - compile
-    runs-on: ${{ matrix.os }}
+    # - compile
+    runs-on: ubuntu-latest
     container:
       image: btwiuse/arch:vscode-base
     strategy:
@@ -121,14 +121,12 @@ jobs:
         include:
         - slug: X64
           vscode_arch: x64
-          os: ubuntu-22.04
           gh_arch: amd64
         - slug: ARM64
           vscode_arch: arm64
-          os: ubuntu-22.04-arm
-          gh_arch: arm64
+          gh_arch: amd64
     env:
-      BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
+      # BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
@@ -153,11 +151,6 @@ jobs:
           CHECK_ONLY_REH: 'yes'
         run: ./check_tags.sh
 
-      - name: Download vscode artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: vscode
-
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -179,8 +172,8 @@ jobs:
   web:
     needs:
       - check
-      - compile
-    runs-on: ubuntu-22.04
+    # - compile
+    runs-on: ubuntu-latest
     container:
       image: btwiuse/arch:vscode-base
     strategy:
@@ -190,7 +183,7 @@ jobs:
         - slug: X64
           vscode_arch: x64
     env:
-      BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
+      # BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
       MS_TAG: ${{ needs.check.outputs.MS_TAG }}
       RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
@@ -214,11 +207,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHECK_ONLY_REH: 'yes'
         run: ./check_tags.sh
-
-      - name: Download vscode artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: vscode
 
       - name: Build
         env:
