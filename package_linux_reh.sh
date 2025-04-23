@@ -3,10 +3,6 @@
 
 set -ex
 
-if [[ "${CI_BUILD}" == "no" ]]; then
-  exit 1
-fi
-
 APP_NAME_LC="$( echo "${APP_NAME}" | awk '{print tolower($0)}' )"
 
 mkdir -p assets
@@ -159,45 +155,41 @@ node build/azure-pipelines/distro/mixin-npm
 
 export VSCODE_NODE_GLIBC="-glibc-${GLIBC_VERSION}"
 
-if [[ "${SHOULD_BUILD_REH}" != "no" ]]; then
-  echo "Building REH"
-  # yarn gulp minify-vscode-reh
-  # yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
-  yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
+echo "Building REH"
+# yarn gulp minify-vscode-reh
+# yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
+yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
 
-  # EXPECTED_GLIBC_VERSION="${GLIBC_VERSION}" EXPECTED_GLIBCXX_VERSION="${GLIBCXX_VERSION}" SEARCH_PATH="../vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}" ./build/azure-pipelines/linux/verify-glibc-requirements.sh
+# EXPECTED_GLIBC_VERSION="${GLIBC_VERSION}" EXPECTED_GLIBCXX_VERSION="${GLIBCXX_VERSION}" SEARCH_PATH="../vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}" ./build/azure-pipelines/linux/verify-glibc-requirements.sh
 
-  pushd "../vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
+pushd "../vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
 
-  if [[ -f "../ripgrep_${VSCODE_PLATFORM}_${VSCODE_ARCH}.sh" ]]; then
-    bash "../ripgrep_${VSCODE_PLATFORM}_${VSCODE_ARCH}.sh" "node_modules"
-  fi
-
-  echo "Archiving REH"
-  tar czf "../assets/${APP_NAME_LC}-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-${RELEASE_VERSION}.tar.gz" .
-
-  popd
+if [[ -f "../ripgrep_${VSCODE_PLATFORM}_${VSCODE_ARCH}.sh" ]]; then
+  bash "../ripgrep_${VSCODE_PLATFORM}_${VSCODE_ARCH}.sh" "node_modules"
 fi
 
-if [[ "${SHOULD_BUILD_REH_WEB}" != "no" ]]; then
-  echo "Building REH-web"
-  # yarn gulp minify-vscode-reh-web
-  # yarn gulp "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
-  yarn gulp "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
+echo "Archiving REH"
+tar czf "../assets/${APP_NAME_LC}-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-${RELEASE_VERSION}.tar.gz" .
 
-  # EXPECTED_GLIBC_VERSION="${GLIBC_VERSION}" EXPECTED_GLIBCXX_VERSION="${GLIBCXX_VERSION}" SEARCH_PATH="../vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}" ./build/azure-pipelines/linux/verify-glibc-requirements.sh
+popd
 
-  pushd "../vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
+echo "Building REH-web"
+# yarn gulp minify-vscode-reh-web
+# yarn gulp "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
+yarn gulp "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
 
-  if [[ -f "../ripgrep_${VSCODE_PLATFORM}_${VSCODE_ARCH}.sh" ]]; then
-    bash "../ripgrep_${VSCODE_PLATFORM}_${VSCODE_ARCH}.sh" "node_modules"
-  fi
+# EXPECTED_GLIBC_VERSION="${GLIBC_VERSION}" EXPECTED_GLIBCXX_VERSION="${GLIBCXX_VERSION}" SEARCH_PATH="../vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}" ./build/azure-pipelines/linux/verify-glibc-requirements.sh
 
-  echo "Archiving REH-web"
-  tar czf "../assets/${APP_NAME_LC}-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}-${RELEASE_VERSION}.tar.gz" .
+pushd "../vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
 
-  popd
+if [[ -f "../ripgrep_${VSCODE_PLATFORM}_${VSCODE_ARCH}.sh" ]]; then
+  bash "../ripgrep_${VSCODE_PLATFORM}_${VSCODE_ARCH}.sh" "node_modules"
 fi
+
+echo "Archiving REH-web"
+tar czf "../assets/${APP_NAME_LC}-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}-${RELEASE_VERSION}.tar.gz" .
+
+popd
 
 cd ..
 

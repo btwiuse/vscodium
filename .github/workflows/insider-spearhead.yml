@@ -54,28 +54,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./build.sh
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Update <quality>.json
         run: ./update_qualityjson.sh
         env:
           GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
           GITHUB_USERNAME: ${{ github.repository_owner }}
-        if: env.SHOULD_BUILD == 'yes' && github.event.inputs.dont_update != 'true'
+        if: github.event.inputs.dont_update != 'true'
 
       - name: Prepare source
         run: ./prepare_src.sh
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Release source
         env:
           GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
           GITHUB_USERNAME: ${{ github.repository_owner }}
         run: ./release.sh
-        if: env.SHOULD_BUILD == 'yes'
 
       - name: Dispatch builds
         uses: peter-evans/repository-dispatch@v3
         with:
           event-type: 'insider'
-        if: github.event.inputs.dont_dispatch != 'true' && (env.SHOULD_BUILD == 'yes' || github.event.inputs.force_dispatch == 'true')
+        if: github.event.inputs.dont_dispatch != 'true' && github.event.inputs.force_dispatch == 'true'
