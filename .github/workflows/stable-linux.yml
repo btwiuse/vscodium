@@ -151,6 +151,9 @@ jobs:
           CHECK_ONLY_REH: 'yes'
         run: ./check_tags.sh
 
+      - name: Clone VSCode repo
+        run: ./get_repo.sh
+
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -207,6 +210,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHECK_ONLY_REH: 'yes'
         run: ./check_tags.sh
+
+      - name: Clone VSCode repo
+        run: ./get_repo.sh
 
       - name: Build
         env:
