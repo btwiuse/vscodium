@@ -160,6 +160,9 @@ echo "Building REH"
 # yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
 yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
 
+# Add LICENSE file to vscode-reh directory
+cp ../LICENSE .
+
 # EXPECTED_GLIBC_VERSION="${GLIBC_VERSION}" EXPECTED_GLIBCXX_VERSION="${GLIBCXX_VERSION}" SEARCH_PATH="../vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}" ./build/azure-pipelines/linux/verify-glibc-requirements.sh
 
 pushd "../vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
@@ -177,6 +180,9 @@ echo "Building REH-web"
 # yarn gulp minify-vscode-reh-web
 # yarn gulp "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
 yarn gulp "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
+
+# Add LICENSE file to vscode-reh-web directory
+cp ../LICENSE .
 
 # EXPECTED_GLIBC_VERSION="${GLIBC_VERSION}" EXPECTED_GLIBCXX_VERSION="${GLIBCXX_VERSION}" SEARCH_PATH="../vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}" ./build/azure-pipelines/linux/verify-glibc-requirements.sh
 

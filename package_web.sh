@@ -47,6 +47,7 @@ done
 echo "Building WEB"
 yarn gulp vscode-web
 
+cp ../LICENSE .
 pushd "../vscode-web"
 
 echo "Archiving WEB"
