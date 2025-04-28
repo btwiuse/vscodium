@@ -49,6 +49,8 @@ yarn gulp vscode-web
 
 pushd "../vscode-web"
 
+cp ../vscode/LICENSE .
+
 echo "Archiving WEB"
 tar czf "../assets/${APP_NAME_LC}-web-${RELEASE_VERSION}.tar.gz" .
 

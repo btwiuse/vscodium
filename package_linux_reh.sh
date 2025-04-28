@@ -168,6 +168,8 @@ if [[ -f "../ripgrep_${VSCODE_PLATFORM}_${VSCODE_ARCH}.sh" ]]; then
   bash "../ripgrep_${VSCODE_PLATFORM}_${VSCODE_ARCH}.sh" "node_modules"
 fi
 
+cp ../vscode/LICENSE .
+
 echo "Archiving REH"
 tar czf "../assets/${APP_NAME_LC}-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-${RELEASE_VERSION}.tar.gz" .
 
@@ -185,6 +187,8 @@ pushd "../vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}"
 if [[ -f "../ripgrep_${VSCODE_PLATFORM}_${VSCODE_ARCH}.sh" ]]; then
   bash "../ripgrep_${VSCODE_PLATFORM}_${VSCODE_ARCH}.sh" "node_modules"
 fi
+
+cp ../vscode/LICENSE .
 
 echo "Archiving REH-web"
 tar czf "../assets/${APP_NAME_LC}-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}-${RELEASE_VERSION}.tar.gz" .
