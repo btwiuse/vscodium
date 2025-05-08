@@ -127,10 +127,8 @@ jobs:
         include:
         - slug: X64
           vscode_arch: x64
-          gh_arch: amd64
         - slug: ARM64
           vscode_arch: arm64
-          gh_arch: amd64
     env:
       # BUILD_SOURCEVERSION: ${{ needs.compile.outputs.BUILD_SOURCEVERSION }}
       MS_COMMIT: ${{ needs.check.outputs.MS_COMMIT }}
@@ -150,9 +148,6 @@ jobs:
         env:
           PULL_REQUEST_ID: ${{ github.event.inputs.checkout_pr }}
         run: ./get_pr.sh
-
-      - name: Install GH
-        run: ./install_gh.sh ${{ matrix.gh_arch }}
 
       - name: Check existing VSCodium tags/releases
         env:
@@ -213,9 +208,6 @@ jobs:
         env:
           PULL_REQUEST_ID: ${{ github.event.inputs.checkout_pr }}
         run: ./get_pr.sh
-
-      - name: Install GH
-        run: ./install_gh.sh
 
       - name: Check existing VSCodium tags/releases
         env:
