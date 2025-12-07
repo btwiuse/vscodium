@@ -120,7 +120,7 @@ for i in {1..5}; do # try 5 times
   echo "Npm install failed $i, trying again..."
 done
 
-node build/azure-pipelines/distro/mixin-npm
+node build/azure-pipelines/distro/mixin-npm.ts
 
 yarn gulp "vscode-linux-${VSCODE_ARCH}-min-ci"
 
