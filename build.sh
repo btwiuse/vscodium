@@ -52,10 +52,10 @@ else # linux
   VSCODE_PLATFORM="linux"
 fi
 
-yarn gulp minify-vscode-reh
+# yarn gulp minify-vscode-reh
 yarn gulp "vscode-reh-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
 
-yarn gulp minify-vscode-reh-web
+# yarn gulp minify-vscode-reh-web
 yarn gulp "vscode-reh-web-${VSCODE_PLATFORM}-${VSCODE_ARCH}-min-ci"
 
 cd ..
