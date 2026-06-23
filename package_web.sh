@@ -45,7 +45,8 @@ for i in {1..5}; do # try 5 times
 done
 
 echo "Building WEB"
-yarn gulp vscode-web
+# yarn gulp vscode-web
+npx tsx build/next/index.ts bundle --target web --out ../vscode-web
 
 pushd "../vscode-web"
 
@@ -57,7 +58,8 @@ tar czf "../assets/${APP_NAME_LC}-web-${RELEASE_VERSION}.tar.gz" .
 popd
 
 echo "Building WEB Only"
-yarn gulp vscode-web-only
+# yarn gulp vscode-web-only
+npx tsx build/next/index.ts bundle --target web-only --out ../vscode-web-only
 
 pushd "../vscode-web-only"
 
