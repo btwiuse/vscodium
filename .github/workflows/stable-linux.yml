@@ -6,6 +6,9 @@ on:
       checkout_pr:
         type: string
         description: Checkout PR
+      full_build:
+        type: boolean
+        default: false
   repository_dispatch:
     types: [stable]
   push:
@@ -115,6 +118,7 @@ jobs:
           retention-days: 30
 
   reh_linux:
+    if: ${{ github.event.inputs.full_build == 'true' }}
     needs:
       - check
     # - compile
