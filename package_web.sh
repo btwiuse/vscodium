@@ -45,8 +45,8 @@ for i in {1..5}; do # try 5 times
 done
 
 echo "Building WEB"
-# yarn gulp vscode-web
-npx tsx build/next/index.ts bundle --target web --out ../vscode-web
+yarn gulp vscode-web
+# npx tsx build/next/index.ts bundle --target web --out ../vscode-web
 
 pushd "../vscode-web"
 
