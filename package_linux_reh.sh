@@ -13,7 +13,7 @@ cd vscode || { echo "'vscode' dir not found"; exit 1; }
 
 GLIBC_VERSION="2.28"
 GLIBCXX_VERSION="3.4.26"
-NODE_VERSION="20.18.1"
+NODE_VERSION="24.18.0"
 
 export VSCODE_NODEJS_URLROOT='/download/release'
 export VSCODE_NODEJS_URLSUFFIX=''
@@ -44,7 +44,7 @@ elif [[ "${VSCODE_ARCH}" == "ppc64le" ]]; then
   export VSCODE_SYSROOT_VERSION='20240129-253798'
   export USE_GNUPP2A=1
 elif [[ "${VSCODE_ARCH}" == "riscv64" ]]; then
-  NODE_VERSION="20.16.0"
+  NODE_VERSION="24.18.0"
   VSCODE_REMOTE_DEPENDENCIES_CONTAINER_NAME="vscodium/vscodium-linux-build-agent:focal-devtoolset-riscv64"
 
   export ELECTRON_SKIP_BINARY_DOWNLOAD=1
@@ -52,7 +52,7 @@ elif [[ "${VSCODE_ARCH}" == "riscv64" ]]; then
   export VSCODE_SKIP_SETUPENV=1
   export VSCODE_NODEJS_SITE='https://unofficial-builds.nodejs.org'
 elif [[ "${VSCODE_ARCH}" == "loong64" ]]; then
-  NODE_VERSION="20.16.0"
+  NODE_VERSION="24.18.0"
   VSCODE_REMOTE_DEPENDENCIES_CONTAINER_NAME="vscodium/vscodium-linux-build-agent:trixie-devtoolset-loong64"
 
   export ELECTRON_SKIP_BINARY_DOWNLOAD=1
@@ -77,7 +77,7 @@ VSCODE_HOST_MOUNT="$( pwd )"
 export VSCODE_HOST_MOUNT
 # export VSCODE_REMOTE_DEPENDENCIES_CONTAINER_NAME
 
-sed -i "/target/s/\"20.*\"/\"${NODE_VERSION}\"/" remote/.npmrc
+sed -i "/target/s/\"24.*\"/\"${NODE_VERSION}\"/" remote/.npmrc
 
 if [[ -d "../patches/linux/reh/" ]]; then
   for file in "../patches/linux/reh/"*.patch; do

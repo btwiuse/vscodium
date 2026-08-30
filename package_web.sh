@@ -15,7 +15,7 @@ mkdir -p assets
 
 cd vscode || { echo "'vscode' dir not found"; exit 1; }
 
-NODE_VERSION="20.18.1"
+NODE_VERSION="24.18.0"
 
 export VSCODE_PLATFORM='linux'
 export VSCODE_SKIP_NODE_VERSION_CHECK=1
@@ -24,7 +24,7 @@ VSCODE_HOST_MOUNT="$( pwd )"
 
 export VSCODE_HOST_MOUNT
 
-sed -i "/target/s/\"20.*\"/\"${NODE_VERSION}\"/" remote/.npmrc
+sed -i "/target/s/\"24.*\"/\"${NODE_VERSION}\"/" remote/.npmrc
 
 for i in {1..5}; do # try 5 times
   npm ci --prefix build && break
